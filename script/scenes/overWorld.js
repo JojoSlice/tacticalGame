@@ -1,5 +1,4 @@
-import Player from '../models/player.js';
-
+import Player from "../models/player.js";
 
 export default class OverworldScene extends Phaser.Scene {
   constructor() {
@@ -7,8 +6,9 @@ export default class OverworldScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("tileset", "../../assets/maps/Set1.png");
     this.load.tilemapTiledJSON("map", "../../assets/maps/startMap..tmj");
+    this.load.image("dungeonTiles", "../../assets/maps/Set1.png");
+
     this.load.spritesheet(
       "player",
       "../../assets/characterSprites/player/Sword_Walk/Sword_Walk_full.png",
@@ -32,7 +32,7 @@ export default class OverworldScene extends Phaser.Scene {
     );
     this.load.spritesheet(
       "torchSprite",
-      "../../assets/objectSprites/Torch Yellow.png",
+      "../../assets/objectSprites/tworchSprite.png",
       {
         frameWidth: 16,
         frameHeight: 16,
@@ -42,13 +42,24 @@ export default class OverworldScene extends Phaser.Scene {
 
   create() {
     const map = this.make.tilemap({ key: "map" });
-    const tileset = map.addTilesetImage("tileset", "tileset");
+    const tileset = map.addTilesetImage("dungeonTiles", "dungeonTiles");
+    this.textures
+      .get("dungeonTiles")
+      .setFilter(Phaser.Textures.FilterMode.NEAREST);
+
+    const mapWidth = map.widthInPixels;
+    const mapHeight = map.heightInPixels;
 
     const groundLayer = map.createLayer("floorAndWalls", tileset);
     const pillarLayer = map.createLayer("pillars", tileset);
     groundLayer.setCollisionByProperty({ collides: true });
     pillarLayer.setCollisionByProperty({ collides: true });
 
+    const camera = this.cameras.main;
+    this.cameras.main.roundPixels = true;
+    camera.setZoom(3);
+
+    camera.setBounds(0, 0, mapWidth, mapHeight);
 
     const spawnPoint = map.findObject(
       "spawnPoints",
@@ -56,41 +67,29 @@ export default class OverworldScene extends Phaser.Scene {
     );
 
     this.player = new Player(this, spawnPoint.x, spawnPoint.y, "player");
+    camera.startFollow(this.player.getSprite());
+
+    console.log("Player position:", this.player.x, this.player.y);
+    console.log("Camera position:", camera.scrollX, camera.scrollY);
 
     this.physics.add.collider(this.player.getSprite(), groundLayer);
     this.physics.add.collider(this.player.getSprite(), pillarLayer);
+    this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+    this.player.getSprite().body.setCollideWorldBounds(true);
 
     this.potions = this.physics.add.group();
     this.torches = this.physics.add.staticGroup();
 
     map.getObjectLayer("objects").objects.forEach((obj) => {
-      if (obj.itemType === "potion") {
+      console.log(obj);
+      if (obj.type === "item") {
         if (obj.name === "healthPotion") {
-          this.healthPotions.create(
-            obj.x,
-            obj.y - obj.height,
-            "healthPotionSprite",
-          );
+          this.potions.create(obj.x, obj.y - obj.height, "healthPotionSprite");
         } else if (obj.name == "manaPotion") {
-          this.manaPotions.create(
-            obj.x,
-            obj.y - obj.height,
-            "manaPotionSprite",
-          );
+          this.potions.create(obj.x, obj.y - obj.height, "manaPotionSprite");
         }
-      } else if (obj.type === "torch") {
-        const torch = this.torches.create(obj.x, obj.y - obj.height, "torchSprite");
-        torch.anims.play('torch-flicker'):
       }
     });
-
-    this.physics.add.overlap(
-      this.player,
-      this.potions,
-      this.collectPotion,
-      null,
-      this,
-    );
 
     this.anims.create({
       key: "torch-flicker",
@@ -101,6 +100,25 @@ export default class OverworldScene extends Phaser.Scene {
       frameRate: 6,
       repeat: -1,
     });
+
+    map.getObjectLayer("decor").objects.forEach((obj) => {
+      if (obj.type === "torch") {
+        const torch = this.torches.create(
+          obj.x,
+          obj.y - obj.height,
+          "torchSprite",
+        );
+        torch.anims.play("torch-flicker", true);
+      }
+    });
+
+    this.physics.add.overlap(
+      this.player.getSprite(),
+      this.potions,
+      this.collectPotion,
+      null,
+      this,
+    );
   }
 
   update() {
