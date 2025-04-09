@@ -1,0 +1,116 @@
+body {
+	position: relative;
+	width: 99vw;
+	height: 97vh;
+	margin: 1px;
+	background-color: black;
+}
+
+#topHUD {
+	height: 20%;
+	width: 100%;
+	border: solid;
+	background-image: url(../images/hudBackground.png);
+	background-size: cover;
+	display: flex;
+	flex-direction: row;
+}
+
+#charInfo {
+	height: 100%;
+	width: 30%;
+	border: solid;
+	display: flex;
+	flex-direction: row;
+
+	#portrait {
+		height: 100%;
+		width: auto;
+	}
+
+	#buttons {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		width: 100%;
+
+		.hudbutton {
+			border: solid;
+			border-color: black;
+			background-color: darkgoldenrod;
+			color: lightgray;
+			height: 33%;
+			width: 100%;
+		}
+
+		.hudbutton:hover {
+			background-color: brown;
+		}
+	}
+
+}
+
+#info {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	width: 40%;
+	text-align: center;
+
+	.infoText {
+		width: 100%;
+		font-family: fantasy;
+	}
+
+	#chapter {
+		height: auto;
+		width: 100%;
+	}
+
+	#chaperInfo {
+		height: auto;
+		width: 100%;
+	}
+
+	#extrainfo {
+		height: auto;
+		width: 100%;
+		margin-bottom: 1em;
+	}
+}
+
+
+#status {
+	height: 100%;
+	width: 30%;
+	border: solid;
+	display: flex;
+	flex-direction: column;
+
+	.statusfield {
+		border: solid;
+		height: 50%;
+	}
+}
+
+.gameContainer {
+	height: 70%;
+	width: 100%;
+	border: solid;
+}
+
+#bottomHUD {
+	height: 10%;
+	width: 100%;
+	border: solid;
+	background-image: url(../images/hudBackground.png);
+	background-size: cover;
+
+	#xp {
+		border: solid;
+		border-color: black;
+		width: 80%;
+		height: 100%;
+		margin-left: 10%;
+	}
+}
