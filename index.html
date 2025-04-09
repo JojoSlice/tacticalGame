@@ -5,40 +5,20 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Tactical</title>
-	<link rel="stylesheet" href="css/style.css">
+	<style>
+		body {
+			margin: 0;
+			overflow: hidden;
+		}
+
+		canvas {
+			display: block;
+		}
+	</style>
+	<script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
 </head>
 
 <body>
-	<header id="topHUD">
-		<div id="charInfo">
-			<img id="portrait" src="images/portrait.png">
-			<div id="buttons">
-				<button class="hudbutton" id="inventory">Inventory</button>
-				<button class="hudbutton" id="character">Character</button>
-				<button class="hudbutton" id="skills">Skills</button>
-			</div>
-		</div>
-		<div id="info">
-			<h1 class="infoText" id="chapter">Chapter title</h1>
-			<h3 class="infoText" id="chapterInfo">Chapter info</h3>
-			<p class="infoText" id="extrainfo">More info</p>
-		</div>
-		<div id="status">
-			<div class="statusfield" id="health"></div>
-			<div class="statusfield" id="mana"></div>
-		</div>
-	</header>
-
-	<main id="gameContainer" class="gameContainer">
-
-	</main>
-
-	<footer id="bottomHUD">
-		<div id="xp">
-
-		</div>
-
-	</footer>
 	<script src="script/main.js"></script>
 </body>
 
