@@ -59,7 +59,7 @@ export default class Player {
         start: 0,
         end: 11,
       }),
-      frameRate: 8,
+      frameRate: 6,
       repeat: -1,
     });
     this.scene.anims.create({
@@ -68,7 +68,7 @@ export default class Player {
         start: 12,
         end: 23,
       }),
-      frameRate: 8,
+      frameRate: 6,
       repeat: -1,
     });
     this.scene.anims.create({
@@ -77,7 +77,7 @@ export default class Player {
         start: 24,
         end: 35,
       }),
-      frameRate: 8,
+      frameRate: 6,
       repeat: -1,
     });
     this.scene.anims.create({
@@ -86,13 +86,13 @@ export default class Player {
         start: 36,
         end: 39,
       }),
-      frameRate: 8,
+      frameRate: 2,
       repeat: -1,
     });
   }
 
   update() {
-    const speed = 150;
+    const speed = 80;
     this.sprite.setVelocity(0);
 
     if (this.cursors.Left.isDown) {
