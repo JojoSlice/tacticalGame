@@ -3,7 +3,7 @@ class BattleScene extends Phaser.Scene {
     super({ key: "BattleScene" });
     this.player;
     this.enemy;
-    this.turn = "player"; // Turordning: spelaren börjar
+    this.turn = "player";
   }
 
   preload() {
