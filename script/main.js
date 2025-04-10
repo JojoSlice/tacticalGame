@@ -1,7 +1,7 @@
-import BootScene from "./scenes/bootScene.js";
+//import BootScene from "./scenes/bootScene.js";
 //import BattleScene from "./scenes/battleScene.js";
 import OverworldScene from "./scenes/overWorld.js";
-//import UIScene from "./scenes/uiScene.js";
+import UIScene from "./scenes/uiScene.js";
 
 const config = {
   type: Phaser.AUTO,
@@ -14,7 +14,7 @@ const config = {
       debug: false,
     },
   },
-  scene: [BootScene, OverworldScene],
+  scene: [OverworldScene, UIScene],
 };
 
 const game = new Phaser.Game(config);

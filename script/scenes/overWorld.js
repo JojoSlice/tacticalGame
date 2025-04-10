@@ -80,9 +80,6 @@ export default class OverworldScene extends Phaser.Scene {
     this.player.getSprite().setDepth(2);
     camera.startFollow(this.player.getSprite());
 
-    console.log("Player position:", this.player.x, this.player.y);
-    console.log("Camera position:", camera.scrollX, camera.scrollY);
-
     this.physics.add.collider(this.player.getSprite(), groundLayer);
     this.physics.add.collider(this.player.getSprite(), pillarLayer);
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -150,6 +147,8 @@ export default class OverworldScene extends Phaser.Scene {
       null,
       this,
     );
+
+    this.scene.launch("UIScene");
   }
 
   update() {
