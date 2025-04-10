@@ -102,7 +102,8 @@ export default class OverworldScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.player.getSprite().body.setCollideWorldBounds(true);
 
-    this.enemies = this.physics.add.group(); // Skapa gruppen för fienderna
+    this.enemies = this.physics.add.group();
+    this.enemyInstances = [];
 
     map.getObjectLayer("spawnPoints").objects.forEach((obj) => {
       console.log(obj);
@@ -113,6 +114,7 @@ export default class OverworldScene extends Phaser.Scene {
         sprite.setDepth(1);
 
         this.enemies.add(sprite);
+        this.enemyInstances.push(this.smallEnemy);
 
         this.physics.add.collider(sprite, groundLayer);
         this.physics.add.collider(sprite, pillarLayer);
@@ -196,13 +198,16 @@ export default class OverworldScene extends Phaser.Scene {
 
   update() {
     this.player.update();
-    this.enemies.getChildren().forEach((enemy) => {
-      enemy.update();
+
+    this.enemyInstances.forEach((enemy) => {
+      if (enemy && enemy.update) {
+        enemy.update(this.player.getSprite());
+      }
     });
   }
 
   battleStart(player, enemy) {
-    enemy.destroy();
+    enemy.disableBody(true, true);
     console.log("Battle trigger." + enemy);
   }
 
