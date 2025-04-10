@@ -1,4 +1,5 @@
 import Player from "../models/player.js";
+import SmallEnemy from "../models/smalEnemy.js";
 
 export default class OverworldScene extends Phaser.Scene {
   constructor() {
@@ -46,6 +47,22 @@ export default class OverworldScene extends Phaser.Scene {
         frameHeight: 16,
       },
     );
+    this.load.spritesheet(
+      "smallEnemy",
+      "../../assets/characterSprites/enemies/Orc1/Orc1_idle/orc1_idle_full.png",
+      {
+        frameWidth: 64,
+        frameHeight: 64,
+      },
+    );
+    this.load.spritesheet(
+      "smallEnemyWalk",
+      "../../assets/characterSprites/enemies/Orc1/Orc1_walk/orc1_walk_full.png",
+      {
+        frameWidth: 64,
+        frameHeight: 64,
+      },
+    );
   }
 
   create() {
@@ -84,6 +101,32 @@ export default class OverworldScene extends Phaser.Scene {
     this.physics.add.collider(this.player.getSprite(), pillarLayer);
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.player.getSprite().body.setCollideWorldBounds(true);
+
+    this.enemies = this.physics.add.group(); // Skapa gruppen för fienderna
+
+    map.getObjectLayer("spawnPoints").objects.forEach((obj) => {
+      console.log(obj);
+      if (obj.type === "mobSpawn") {
+        this.smallEnemy = new SmallEnemy(this, obj.x, obj.y, "smallEnemy");
+
+        const sprite = this.smallEnemy.getSprite();
+        sprite.setDepth(1);
+
+        this.enemies.add(sprite);
+
+        this.physics.add.collider(sprite, groundLayer);
+        this.physics.add.collider(sprite, pillarLayer);
+        sprite.body.setCollideWorldBounds(true);
+
+        this.physics.add.collider(
+          this.player.getSprite(),
+          sprite,
+          this.battleStart,
+          null,
+          this,
+        );
+      }
+    });
 
     this.potions = this.physics.add.group();
     this.torches = this.physics.add.staticGroup();
@@ -153,6 +196,14 @@ export default class OverworldScene extends Phaser.Scene {
 
   update() {
     this.player.update();
+    this.enemies.getChildren().forEach((enemy) => {
+      enemy.update();
+    });
+  }
+
+  battleStart(player, enemy) {
+    enemy.destroy();
+    console.log("Battle trigger." + enemy);
   }
 
   collectPotion(player, potion) {
