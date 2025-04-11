@@ -4,7 +4,14 @@ export default class SmallEnemyBattle {
     this.sprite = scene.physics.add.sprite(x, y, sprite);
 
     this.sprite.setSize(24, 24);
-    this.sprite.setOffset(12, 12);
+    this.sprite.setOffset(40, 34);
+
+    this.maxHealth = 80;
+    this.health = this.maxHealth;
+
+    this.maxDmg = 10;
+    this.minDmg = 3;
+    this.critical = 13;
 
     this.speed = 50;
     this.attackRange = 20;
@@ -14,53 +21,45 @@ export default class SmallEnemyBattle {
 
   createAnimations() {
     this.scene.anims.create({
-      key: "idle",
+      key: "idleE",
       frames: this.scene.anims.generateFrameNumbers("enemy", {
         start: 0,
         end: 5,
       }),
       frameRate: 8,
-      repete: -1,
+      repeat: -1,
     });
     this.scene.anims.create({
-      key: "walk",
+      key: "walkE",
       frames: this.scene.anims.generateFrameNumbers("enemy", {
-        start: 6,
-        end: 13,
+        start: 9,
+        end: 16,
       }),
       frameRate: 8,
-      repete: -1,
+      repeat: -1,
     });
     this.scene.anims.create({
-      key: "attack",
+      key: "attackE",
       frames: this.scene.anims.generateFrameNumbers("enemy", {
-        start: 14,
-        end: 19,
+        start: 17,
+        end: 21,
       }),
       frameRate: 8,
-      repete: 0,
+      repeat: 0,
     });
     this.scene.anims.create({
-      key: "hurt",
+      key: "hurtE",
       frames: this.scene.anims.generateFrameNumbers("enemy", {
-        start: 26,
-        end: 29,
+        start: 32,
+        end: 35,
       }),
       frameRate: 5,
-      repete: 0,
+      repeat: 0,
     });
   }
-  update(player, spawn, action) {
-    if (action === "attack") {
-      this.attackAction(player, spawn);
-    } else if (action === "hurt") {
-      this.playHurtAnimation(player);
-    } else {
-      this.playIdleAnimation(player);
-    }
-  }
+  update() {}
 
-  attackAction(player, spawn) {
+  attackAction(player) {
     const distance = this.getDistance(player.x, player.y);
     const angle = this.getAngle(player.x, player.y);
 
@@ -71,11 +70,37 @@ export default class SmallEnemyBattle {
 
     if (distance < this.attackRange) {
       this.sprite.setVelocity(0, 0);
-      this.playAttackAnimation;
-      this.sprite.once("animationcomplete", () => {
-        this.walkBack(spawn, player);
-      });
+      this.playAttackAnimation(player);
+      this.sprite.once("animationcomplete", () => {});
     }
+  }
+
+  takeDamage(damage, player) {
+    this.health = -damage;
+    this.playHurtAnimation(player);
+  }
+
+  isDead() {
+    if (this.health <= 0) {
+      return "true";
+    } else {
+      return "false";
+    }
+  }
+
+  calculateDamage() {
+    const isCritical = Math.random() < 0.1;
+
+    if (isCritical) {
+      return this.critical;
+    } else {
+      return Phaser.Math.Between(this.minDmg, this.maxDmg);
+    }
+  }
+
+  getDmg() {
+    const damage = this.calculateDamage();
+    return damage;
   }
 
   walkBack(spawn, player) {
@@ -87,14 +112,14 @@ export default class SmallEnemyBattle {
 
     this.playWalkAnimation(spawn);
 
-    if (distance < 0) {
+    if (distance < 4) {
       this.sprite.setVelocity(0, 0);
       this.playIdleAnimation(player);
     }
   }
 
   playAttackAnimation(player) {
-    this.sprite.anims.play("attack", true);
+    this.sprite.anims.play("attackE", true);
     if (player.x < this.sprite.x) {
       this.sprite.setFlipX(true);
     } else {
@@ -103,7 +128,7 @@ export default class SmallEnemyBattle {
   }
 
   playWalkAnimation(player) {
-    this.sprite.anims.play("walk", true);
+    this.sprite.anims.play("walkE", true);
     if (player.x < this.sprite.x) {
       this.sprite.setFlipX(true);
     } else {
@@ -113,7 +138,7 @@ export default class SmallEnemyBattle {
 
   playIdleAnimation(player) {
     this.sprite.setVelocity(0, 0);
-    this.sprite.anims.play("idle", true);
+    this.sprite.anims.play("idleE", true);
 
     if (player.x < this.sprite.x) {
       this.sprite.setFlipX(true);
@@ -123,7 +148,7 @@ export default class SmallEnemyBattle {
   }
 
   playHurtAnimation(player) {
-    this.sprite.anims.play("hurt", true);
+    this.sprite.anims.play("hurtE", true);
     if (player.x < this.sprite.x) {
       this.sprite.setFlipX(true);
     } else {
@@ -144,5 +169,8 @@ export default class SmallEnemyBattle {
   getAngle(x, y) {
     const angle = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, x, y);
     return angle;
+  }
+  getSprite() {
+    return this.sprite;
   }
 }
