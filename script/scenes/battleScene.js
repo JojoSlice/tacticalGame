@@ -93,17 +93,18 @@ export default class BattleScene extends Phaser.Scene {
     const midY = (player.y + enemy.y) / 2;
     this.cameras.main.x = 119;
     this.cameras.main.y = 150;
-    // Uppdatera dummy sprite till mitten mellan spelaren och fienden
 
-    this.player.playHurtAnimation(this.enemy.getSprite());
-    this.enemy.playHurtAnimation(this.player.getSprite());
-    //if (this.turn === "enemy") {
-    //console.log("enemy turn");
+    this.enemy.playIdleAnimation(player);
+    this.player.playIdleAnimation(enemy.x, enemy.y);
+    this.player.attackAction(enemy.x, enemy.y, this.playerSpawn);
+    console.log(player.x, player.y);
+    // if (this.turn === "enemy") {
+    // console.log("enemy turn");
     //this.enemyTurn();
-    //} else if (this.turn === "player") {
-    //console.log("player turn");
-    //this.playerTurn();
-    // }
+    // } else if (this.turn === "player") {
+    // console.log("player turn");
+    // this.playerTurn();
+    //}
   }
 
   createUI() {
@@ -113,25 +114,26 @@ export default class BattleScene extends Phaser.Scene {
 
   playerTurn() {
     this.playerAttack();
+    this.turn = "enemy";
   }
 
   playerAttack() {
-    console.log("player attack");
-    const enemySprite = this.enemy.getSprite();
-
     const damage = this.player.getDmg();
-    this.player.attackAction(enemySprite);
+    this.player.attackAction(
+      this.enemy.sprite.x,
+      this.enemy.sprite.y,
+      this.playerSpawn,
+    );
+    //    this.enemy.takeDamage(damage, this.player);
+    //this.showFloatingText(enemySprite.x, enemySprite.y, damage);
+    //this.updateHealthUI();
 
-    this.enemy.takeDamage(damage, this.player);
-    this.showFloatingText(enemySprite.x, enemySprite.y, damage);
-    this.updateHealthUI();
-
-    if (this.enemy.isDead() === "true") {
-      this.endBattle("win");
-    } else {
-      this.player.walkBack(this.playerSpawn, this.enemy);
-      this.turn = "enemy";
-    }
+    //if (this.enemy.isDead() === "true") {
+    //this.endBattle("win");
+    //} else {
+    // this.player.walkBack(this.playerSpawn, this.enemy);
+    // this.turn = "enemy";
+    //}
   }
 
   enemyTurn() {

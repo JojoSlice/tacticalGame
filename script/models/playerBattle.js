@@ -59,25 +59,21 @@ export default class PlayerBattle {
   }
   update() {}
 
-  attackAction(enemy) {
-    const distance = this.getDistance(enemy.x, enemy.y);
-    const angle = this.getAngle(enemy.x, enemy.y);
-
-    console.log(distance);
+  attackAction(x, y, spawn) {
+    const distance = this.getDistance(x, y);
+    const angle = this.getAngle(x, y);
 
     this.sprite.setVelocity(
       Math.cos(angle) * this.speed,
       Math.sin(angle) * this.speed,
     );
 
-    this.playWalkAnimation(enemy);
-
-    console.log(this.attackRange);
+    this.playWalkAnimation(x);
 
     if (distance < this.attackRange) {
       console.log("attacking");
       this.sprite.setVelocity(0, 0);
-      this.playAttackAnimation(enemy);
+      this.playAttackAnimation(x);
     }
   }
 
@@ -91,9 +87,9 @@ export default class PlayerBattle {
     }
   }
 
-  takeDamage(damage, enemy) {
+  takeDamage(damage, x) {
     this.health -= damage;
-    this.playHurtAnimation(enemy);
+    this.playHurtAnimation(x);
   }
 
   isDead() {
@@ -109,7 +105,7 @@ export default class PlayerBattle {
     return damage;
   }
 
-  walkBack(spawn, enemy) {
+  walkBack(spawn, x) {
     const distance = this.getDistance(spawn.x, spawn.y);
     const angle = this.getAngle(spawn.x, spawn.y);
 
@@ -120,43 +116,44 @@ export default class PlayerBattle {
 
     if (distance < 4) {
       this.sprite.setVelocity(0, 0);
-      this.playIdleAnimation(enemy);
+      this.playIdleAnimation(x);
+      debugger;
     }
   }
 
-  playAttackAnimation(enemy) {
+  playAttackAnimation(x) {
     console.log("attack animation");
     this.sprite.anims.play("attack", true);
-    if (enemy.x < this.sprite.x) {
+    if (x < this.sprite.x) {
       this.sprite.setFlipX(true);
     } else {
       this.sprite.setFlipX(false);
     }
   }
 
-  playWalkAnimation(enemy) {
+  playWalkAnimation(x) {
     this.sprite.anims.play("walk", true);
-    if (enemy.x < this.sprite.x) {
+    if (x < this.sprite.x) {
       this.sprite.setFlipX(true);
     } else {
       this.sprite.setFlipX(false);
     }
   }
 
-  playIdleAnimation(enemy) {
+  playIdleAnimation(x) {
     this.sprite.setVelocity(0, 0);
     this.sprite.anims.play("idle", true);
 
-    if (enemy.x < this.sprite.x) {
+    if (x < this.sprite.x) {
       this.sprite.setFlipX(true);
     } else {
       this.sprite.setFlipX(false);
     }
   }
 
-  playHurtAnimation(enemy) {
+  playHurtAnimation(x) {
     this.sprite.anims.play("hurt", true);
-    if (enemy.x < this.sprite.x) {
+    if (x < this.sprite.x) {
       this.sprite.setFlipX(true);
     } else {
       this.sprite.setFlipX(false);
