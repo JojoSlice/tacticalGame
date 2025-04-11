@@ -79,11 +79,13 @@ export default class SmallEnemyBattle {
   }
 
   walkBack(spawn, player) {
-    const distance = this.getDistance(player.x, player.y);
+    const distance = this.getDistance(spawn.x, spawn.y);
     const angle = this.getAngle(spawn.x, spawn.y);
 
     this.sprite.body.velocity.x = Math.cos(angle) * this.speed;
     this.sprite.body.velocity.y = Math.sin(angle) * this.speed;
+
+    this.playWalkAnimation(spawn);
 
     if (distance < 0) {
       this.sprite.setVelocity(0, 0);
