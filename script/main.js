@@ -1,5 +1,5 @@
 //import BootScene from "./scenes/bootScene.js";
-import BattleScene from "./scenes/battleScene.js";
+import BattleScene from "./scenes/testBattle.js";
 import OverworldScene from "./scenes/overWorld.js";
 import UIScene from "./scenes/uiScene.js";
 
@@ -11,7 +11,7 @@ const config = {
   physics: {
     default: "arcade",
     arcade: {
-      debug: true,
+      debug: false,
     },
   },
   scene: [BattleScene],

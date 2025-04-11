@@ -14,7 +14,7 @@ export default class PlayerBattle {
     this.critical = 15;
 
     this.speed = 50;
-    this.attackRange = 24;
+    this.attackRange = 40;
 
     this.createAnimations();
   }
@@ -59,7 +59,7 @@ export default class PlayerBattle {
   }
   update() {}
 
-  attackAction(x, y, spawn) {
+  walkUp(x, y) {
     const distance = this.getDistance(x, y);
     const angle = this.getAngle(x, y);
 
@@ -67,13 +67,12 @@ export default class PlayerBattle {
       Math.cos(angle) * this.speed,
       Math.sin(angle) * this.speed,
     );
-
     this.playWalkAnimation(x);
 
-    if (distance < this.attackRange) {
-      console.log("attacking");
+    console.log(distance);
+    if (distance <= this.attackRange) {
       this.sprite.setVelocity(0, 0);
-      this.playAttackAnimation(x);
+      return true;
     }
   }
 
@@ -98,6 +97,10 @@ export default class PlayerBattle {
     } else {
       return "false";
     }
+  }
+
+  getHealth() {
+    return this.health;
   }
 
   getDmg() {

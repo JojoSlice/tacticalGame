@@ -7,6 +7,7 @@ export default class BattleScene extends Phaser.Scene {
     this.player;
     this.enemy;
     this.turn = "player";
+    this.strikeDistance = 40;
   }
 
   preload() {
@@ -74,12 +75,10 @@ export default class BattleScene extends Phaser.Scene {
     this.physics.add.collider(this.enemy.getSprite(), floorLayer);
     this.enemy.getSprite().body.setCollideWorldBounds(true);
 
-    // Skapa en dummy sprite för kameran att följa
     const camera = this.cameras.main;
     this.cameras.main.roundPixels = true;
     camera.setZoom(5);
-    camera.centerOn(119, 150);
-    // Använd setFollow för att följa dummy
+    camera.centerOn(145, 150);
 
     this.createUI();
   }
@@ -88,23 +87,17 @@ export default class BattleScene extends Phaser.Scene {
     const player = this.player.getSprite();
     const enemy = this.enemy.getSprite();
 
-    // Beräkna mitten mellan spelaren och fienden
-    const midX = (player.x + enemy.x) / 2;
-    const midY = (player.y + enemy.y) / 2;
-    this.cameras.main.x = 119;
-    this.cameras.main.y = 150;
+    this.updateHealthUI(player, enemy);
+    if (this.turn === "enemy") {
+      this.player.playIdleAnimation(enemy.x);
+    } else {
+      this.enemy.playIdleAnimation(player.x, player.y);
+    }
+  }
 
-    this.enemy.playIdleAnimation(player);
-    this.player.playIdleAnimation(enemy.x, enemy.y);
-    this.player.attackAction(enemy.x, enemy.y, this.playerSpawn);
-    console.log(player.x, player.y);
-    // if (this.turn === "enemy") {
-    // console.log("enemy turn");
-    //this.enemyTurn();
-    // } else if (this.turn === "player") {
-    // console.log("player turn");
-    // this.playerTurn();
-    //}
+  getDistance(x1, x2) {
+    const distance = Phaser.Math.Distance.Between(x1, x2);
+    return distance;
   }
 
   createUI() {
@@ -112,8 +105,8 @@ export default class BattleScene extends Phaser.Scene {
     this.enemyHealthBar = this.add.graphics();
   }
 
-  playerTurn() {
-    this.playerAttack();
+  playerTurn(enemy) {
+    this.player.walkUp(enemy.x, enemy.y);
     this.turn = "enemy";
   }
 
@@ -174,14 +167,24 @@ export default class BattleScene extends Phaser.Scene {
     });
   }
 
-  updateHealthUI() {
+  updateHealthUI(player, enemy) {
     this.playerHealthBar.clear();
     this.enemyHealthBar.clear();
     this.playerHealthBar.fillStyle(0x00ff00, 1);
     this.enemyHealthBar.fillStyle(0xff0000, 1);
 
-    this.playerHealthBar.fillRect(50, 50, this.player.health, 20);
-    this.enemyHealthBar.fillRect(450, 50, this.enemy.health, 20);
+    this.playerHealthBar.fillRect(
+      player.x - this.player.health / 2,
+      player.y + 40,
+      this.player.health,
+      5,
+    );
+    this.enemyHealthBar.fillRect(
+      enemy.x - this.enemy.health / 2,
+      enemy.y + 40,
+      this.enemy.health,
+      5,
+    );
   }
 
   endBattle(result) {

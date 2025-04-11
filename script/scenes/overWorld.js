@@ -208,6 +208,7 @@ export default class OverworldScene extends Phaser.Scene {
 
   battleStart(player, enemy) {
     enemy.disableBody(true, true);
+    enemy.setActive(false);
     console.log("Battle trigger." + enemy);
   }
 
