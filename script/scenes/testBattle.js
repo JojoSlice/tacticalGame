@@ -81,39 +81,64 @@ export default class BattleScene extends Phaser.Scene {
 
     this.playerHealthBar = this.add.graphics();
     this.enemyHealthBar = this.add.graphics();
+
+    this.delay = 1500;
+    this.waitingForAttack = false;
   }
 
   update() {
     this.updateHealthUI();
-    if (this.turn === "player") {
-      this.time.delayedCall(2000, () => this.playerAttack());
+
+    if (this.turn === "player" && !this.waitingForAttack) {
+      this.waitingForAttack = true;
+      this.time.delayedCall(this.delay, () => this.playerAttack());
     }
   }
 
   playerAttack() {
     if (this.turn !== "player") return;
 
+    this.delay = 1500;
+    if (this.enemy.health <= 0) {
+      debugger; // du kan byta detta till en metod som hanterar vinst
+    }
+
     const damage = this.calculateDamage(this.player);
+    const isCritical = damage === this.player.critical;
+
     this.player.sprite.play("attack");
 
     this.player.sprite.once("animationcomplete", () => {
       this.player.sprite.play("idle");
       this.enemy.health -= damage;
       this.enemy.sprite.play("hurtE");
-      this.showFloatingText(this.enemy.sprite.x, this.enemy.sprite.y, damage);
+
+      let text = damage.toString();
+      if (isCritical) {
+        this.delay = 3000;
+        text += " CRITICAL";
+      }
+
+      this.showFloatingText(
+        this.enemy.sprite.x - text.length * 8,
+        this.enemy.sprite.y,
+        text,
+        isCritical,
+      );
+      this.turn = "enemy";
+
+      this.time.delayedCall(this.delay, () => this.enemyAttack());
     });
-
-    if (this.enemy.health <= 0) {
-      debugger;
-    }
-
-    this.turn = "enemy";
-
-    this.time.delayedCall(2000, () => this.enemyAttack());
   }
 
   enemyAttack() {
     if (this.turn !== "enemy") return;
+
+    this.delay = 1500;
+
+    if (this.enemy.health <= 0) {
+      debugger; // du kan byta detta till en metod som hanterar vinst
+    }
 
     const damage = this.calculateDamage(this.enemy);
     this.enemy.sprite.play("attackE");
@@ -122,14 +147,25 @@ export default class BattleScene extends Phaser.Scene {
       this.enemy.sprite.play("idleE");
       this.player.health -= damage;
       this.player.sprite.play("hurt");
-      this.showFloatingText(this.player.sprite.x, this.player.sprite.y, damage);
+
+      const isCritical = damage === this.enemy.critical;
+      let text = damage.toString();
+
+      if (isCritical) {
+        this.delay = 3000;
+        text += " CRITICAL";
+      }
+
+      this.showFloatingText(
+        this.player.sprite.x - text.length * 8,
+        this.player.sprite.y,
+        text,
+        isCritical,
+      );
+
+      this.turn = "player";
+      this.waitingForAttack = false;
     });
-
-    if (this.player.health <= 0) {
-      debugger;
-    }
-
-    this.turn = "player";
   }
 
   calculateDamage(attacker) {
@@ -148,37 +184,51 @@ export default class BattleScene extends Phaser.Scene {
     this.playerHealthBar.fillStyle(0x00ff00, 1);
     this.enemyHealthBar.fillStyle(0xff0000, 1);
 
+    const playerHealthPercent = this.player.health / this.player.maxHealth;
+    const enemyHealthPercent = this.enemy.health / this.enemy.maxHealth;
+
     this.playerHealthBar.fillRect(
       this.player.sprite.x - this.player.health / 2,
       this.player.sprite.y + 40,
-      this.player.health,
+      this.player.maxHealth * playerHealthPercent,
       5,
     );
     this.enemyHealthBar.fillRect(
       this.enemy.sprite.x - this.enemy.health / 2,
       this.enemy.sprite.y + 40,
-      this.enemy.health,
+      this.enemy.maxHealth * enemyHealthPercent,
       5,
     );
   }
 
-  showFloatingText(x, y, text) {
-    const damageText = this.add.text(x, y - 20, text, {
-      font: "18px Arial",
-      fill: "#ff0000",
+  showFloatingText(x, y, text, isCritical = false) {
+    const damageText = this.add.text(x, y - 30, text, {
+      font: isCritical ? "24px Arial Black" : "18px Arial",
+      fill: isCritical ? "#ffd700" : "#ff0000", // guld för critical
       stroke: "#000",
-      strokeThickness: 2,
+      strokeThickness: 3,
     });
 
-    this.tweens.add({
+    const tweenConfig = {
       targets: damageText,
       y: y - 30,
       alpha: 0,
-      duration: 800,
+      duration: 1500,
       ease: "Power1",
       onComplete: () => {
         damageText.destroy();
       },
-    });
+    };
+
+    if (isCritical) {
+      this.tweens.add({
+        ...tweenConfig,
+        scale: 1.5,
+        yoyo: true,
+        repeat: 0,
+      });
+    } else {
+      this.tweens.add(tweenConfig);
+    }
   }
 }
