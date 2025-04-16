@@ -1,16 +1,18 @@
 import Player from "../models/testPlayer.js";
 import Enemy from "../models/testEnemy.js";
+import UI from "../models/battleUI.js";
 
 export default class BattleScene extends Phaser.Scene {
   constructor() {
     super({ key: "BattleScene" });
+    this.ui;
     this.player;
     this.enemy;
     this.turn = "player";
   }
 
   preload() {
-    this.load.tilemapTiledJSON("map", "../../assets/maps/sidescroll..tmj");
+    this.load.tilemapTiledJSON("map", "../../assets/maps/sidescroll.tmj");
 
     this.load.image("tileset", "../../assets/maps/Tilesetv3.png");
 
@@ -73,6 +75,22 @@ export default class BattleScene extends Phaser.Scene {
     this.physics.add.collider(this.player.sprite, floorLayer);
     this.player.sprite.body.setCollideWorldBounds(true);
 
+    this.ui = new UI(this, this.playerSpawn.x, this.playerSpawn.y + 60, {
+      attack: () => {
+        console.log("Attack valdes");
+        this.ui.hide();
+        this.playerAttack();
+      },
+      defend: () => {
+        console.log("Defend valdes");
+        this.ui.hide();
+      },
+      item: () => {
+        console.log("Item valdes");
+        this.ui.hide();
+      },
+    });
+
     this.enemy = new Enemy(this, this.enemySpawn.x, this.enemySpawn.y, "enemy");
     this.enemy.sprite.play("idleE").setFlipX(true);
 
@@ -91,7 +109,7 @@ export default class BattleScene extends Phaser.Scene {
 
     if (this.turn === "player" && !this.waitingForAttack) {
       this.waitingForAttack = true;
-      this.time.delayedCall(this.delay, () => this.playerAttack());
+      this.time.delayedCall(this.delay, () => this.ui.show());
     }
   }
 
@@ -100,7 +118,7 @@ export default class BattleScene extends Phaser.Scene {
 
     this.delay = 1500;
     if (this.enemy.health <= 0) {
-      debugger; // du kan byta detta till en metod som hanterar vinst
+      debugger; // hantera vinst
     }
 
     const damage = this.calculateDamage(this.player);
@@ -137,7 +155,7 @@ export default class BattleScene extends Phaser.Scene {
     this.delay = 1500;
 
     if (this.enemy.health <= 0) {
-      debugger; // du kan byta detta till en metod som hanterar vinst
+      debugger; // hantera förlust
     }
 
     const damage = this.calculateDamage(this.enemy);
@@ -147,6 +165,9 @@ export default class BattleScene extends Phaser.Scene {
       this.enemy.sprite.play("idleE");
       this.player.health -= damage;
       this.player.sprite.play("hurt");
+      this.player.sprite.once("animationcomplete", () =>
+        this.player.sprite.play("idle"),
+      );
 
       const isCritical = damage === this.enemy.critical;
       let text = damage.toString();
@@ -187,18 +208,22 @@ export default class BattleScene extends Phaser.Scene {
     const playerHealthPercent = this.player.health / this.player.maxHealth;
     const enemyHealthPercent = this.enemy.health / this.enemy.maxHealth;
 
-    this.playerHealthBar.fillRect(
-      this.player.sprite.x - this.player.health / 2,
-      this.player.sprite.y + 40,
-      this.player.maxHealth * playerHealthPercent,
-      5,
-    );
-    this.enemyHealthBar.fillRect(
-      this.enemy.sprite.x - this.enemy.health / 2,
-      this.enemy.sprite.y + 40,
-      this.enemy.maxHealth * enemyHealthPercent,
-      5,
-    );
+    if (this.player.health > 0) {
+      this.playerHealthBar.fillRect(
+        this.player.sprite.x - this.player.health / 2,
+        this.player.sprite.y - 40,
+        this.player.maxHealth * playerHealthPercent,
+        5,
+      );
+    }
+    if (this.enemy.health > 0) {
+      this.enemyHealthBar.fillRect(
+        this.enemy.sprite.x - this.enemy.health / 2,
+        this.enemy.sprite.y - 40,
+        this.enemy.maxHealth * enemyHealthPercent,
+        5,
+      );
+    }
   }
 
   showFloatingText(x, y, text, isCritical = false) {
