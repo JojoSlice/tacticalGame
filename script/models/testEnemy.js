@@ -56,5 +56,14 @@ export default class SmallEnemyBattle {
       frameRate: 5,
       repeat: 1,
     });
+    this.scene.anims.create({
+      key: "deathE",
+      frames: this.scene.anims.generateFrameNumbers("enemy", {
+        start: 40,
+        end: 44,
+      }),
+      frameRate: 5,
+      repeat: 0,
+    });
   }
 }

@@ -56,5 +56,14 @@ export default class PlayerBattle {
       frameRate: 5,
       repeat: 1,
     });
+    this.scene.anims.create({
+      key: "death",
+      frames: this.scene.anims.generateFrameNumbers("player", {
+        start: 54,
+        end: 58,
+      }),
+      frameRate: 8,
+      repeat: 0,
+    });
   }
 }

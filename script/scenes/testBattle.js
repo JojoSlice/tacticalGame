@@ -11,10 +11,14 @@ export default class BattleScene extends Phaser.Scene {
     this.turn = "player";
   }
 
-  preload() {
-    this.load.tilemapTiledJSON("map", "../../assets/maps/sidescroll.tmj");
+  init(data) {
+    this.mainSceneKey = data.mainSceneKey;
+  }
 
-    this.load.image("tileset", "../../assets/maps/Tilesetv3.png");
+  preload() {
+    this.load.tilemapTiledJSON("battlemap", "../../assets/maps/sidescroll.tmj");
+
+    this.load.image("battletileset", "../../assets/maps/Tilesetv3.png");
 
     this.load.spritesheet(
       "player",
@@ -30,8 +34,8 @@ export default class BattleScene extends Phaser.Scene {
   }
 
   create() {
-    const map = this.make.tilemap({ key: "map" });
-    const tileset = map.addTilesetImage("Tilesetv3", "tileset");
+    const map = this.make.tilemap({ key: "battlemap" });
+    const tileset = map.addTilesetImage("Tilesetv3", "battletileset");
     this.textures
       .get("Tilesetv3")
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
@@ -102,6 +106,7 @@ export default class BattleScene extends Phaser.Scene {
 
     this.delay = 1500;
     this.waitingForAttack = false;
+    this.cameras.main.fadeIn(1000, 0, 0, 0);
   }
 
   update() {
@@ -117,9 +122,6 @@ export default class BattleScene extends Phaser.Scene {
     if (this.turn !== "player") return;
 
     this.delay = 1500;
-    if (this.enemy.health <= 0) {
-      debugger; // hantera vinst
-    }
 
     const damage = this.calculateDamage(this.player);
     const isCritical = damage === this.player.critical;
@@ -129,6 +131,7 @@ export default class BattleScene extends Phaser.Scene {
     this.player.sprite.once("animationcomplete", () => {
       this.player.sprite.play("idle");
       this.enemy.health -= damage;
+      console.log(this.enemy.health);
       this.enemy.sprite.play("hurtE");
 
       console.log(this.enemy.health);
@@ -145,9 +148,15 @@ export default class BattleScene extends Phaser.Scene {
         text,
         isCritical,
       );
-      this.turn = "enemy";
-
-      this.time.delayedCall(this.delay, () => this.enemyAttack());
+      if (this.enemy.health <= 0) {
+        this.enemy.sprite.play("deathE");
+        this.enemy.sprite.once("animationcomplete", () =>
+          this.battleEnd("You Win"),
+        );
+      } else {
+        this.turn = "enemy";
+        this.time.delayedCall(this.delay, () => this.enemyAttack());
+      }
     });
   }
 
@@ -155,10 +164,6 @@ export default class BattleScene extends Phaser.Scene {
     if (this.turn !== "enemy") return;
 
     this.delay = 1500;
-
-    if (this.enemy.health <= 0) {
-      debugger; // hantera förlust
-    }
 
     const damage = this.calculateDamage(this.enemy);
     this.enemy.sprite.play("attackE");
@@ -185,9 +190,31 @@ export default class BattleScene extends Phaser.Scene {
         text,
         isCritical,
       );
+      if (this.player.health <= 0) {
+        this.player.sprite.play("death");
+        this.player.sprite.once("animationcomplete", () =>
+          this.battleEnd("You Lose"),
+        );
+      } else {
+        this.turn = "player";
+        this.waitingForAttack = false;
+      }
+    });
+  }
 
-      this.turn = "player";
-      this.waitingForAttack = false;
+  battleEnd(text) {
+    this.showFloatingText(
+      this.cameraPoint.x - 50,
+      this.cameraPoint.y,
+      text,
+      true,
+    );
+    this.time.delayedCall(2000, () => {
+      this.cameras.main.fadeOut(1000, 0, 0, 0);
+      this.cameras.main.once("camerafadeoutcomplete", () => {
+        this.scene.stop();
+        this.scene.resume(this.mainSceneKey);
+      });
     });
   }
 

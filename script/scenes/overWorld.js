@@ -7,11 +7,11 @@ export default class OverworldScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.tilemapTiledJSON("map", "../../assets/maps/startMap..tmj");
+    this.load.tilemapTiledJSON("map", "../../assets/maps/startMap.tmj");
     this.load.image("dungeonTiles", "../../assets/maps/Set1.png");
 
     this.load.spritesheet(
-      "player",
+      "playerOW",
       "../../assets/characterSprites/player/Sword_Walk/Sword_Walk_full.png",
       {
         frameWidth: 64,
@@ -93,7 +93,7 @@ export default class OverworldScene extends Phaser.Scene {
       (obj) => obj.name === "playerSpawn",
     );
 
-    this.player = new Player(this, spawnPoint.x, spawnPoint.y, "player");
+    this.player = new Player(this, spawnPoint.x, spawnPoint.y, "playerOW");
     this.player.getSprite().setDepth(2);
     camera.startFollow(this.player.getSprite());
 
@@ -194,6 +194,10 @@ export default class OverworldScene extends Phaser.Scene {
     );
 
     this.scene.launch("UIScene");
+
+    this.events.on("resume", () => {
+      this.cameras.main.fadeIn(1000, 0, 0, 0);
+    });
   }
 
   update() {
@@ -209,6 +213,13 @@ export default class OverworldScene extends Phaser.Scene {
   battleStart(player, enemy) {
     enemy.disableBody(true, true);
     enemy.setActive(false);
+
+    this.cameras.main.fadeOut(1000, 0, 0, 0);
+
+    this.cameras.main.once("camerafadeoutcomplete", () => {
+      this.scene.pause();
+      this.scene.launch("BattleScene", { mainSceneKey: this.scene.key });
+    });
     console.log("Battle trigger." + enemy);
   }
 

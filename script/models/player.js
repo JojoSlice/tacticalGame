@@ -19,7 +19,7 @@ export default class Player {
   createAnimations() {
     this.scene.anims.create({
       key: "walk-Down",
-      frames: this.scene.anims.generateFrameNumbers("player", {
+      frames: this.scene.anims.generateFrameNumbers("playerOW", {
         start: 0,
         end: 5,
       }),
@@ -28,7 +28,7 @@ export default class Player {
     });
     this.scene.anims.create({
       key: "walk-Left",
-      frames: this.scene.anims.generateFrameNumbers("player", {
+      frames: this.scene.anims.generateFrameNumbers("playerOW", {
         start: 6,
         end: 11,
       }),
@@ -37,7 +37,7 @@ export default class Player {
     });
     this.scene.anims.create({
       key: "walk-Right",
-      frames: this.scene.anims.generateFrameNumbers("player", {
+      frames: this.scene.anims.generateFrameNumbers("playerOW", {
         start: 12,
         end: 17,
       }),
@@ -46,7 +46,7 @@ export default class Player {
     });
     this.scene.anims.create({
       key: "walk-Up",
-      frames: this.scene.anims.generateFrameNumbers("player", {
+      frames: this.scene.anims.generateFrameNumbers("playerOW", {
         start: 18,
         end: 23,
       }),
