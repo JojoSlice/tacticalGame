@@ -131,6 +131,8 @@ export default class BattleScene extends Phaser.Scene {
       this.enemy.health -= damage;
       this.enemy.sprite.play("hurtE");
 
+      console.log(this.enemy.health);
+
       let text = damage.toString();
       if (isCritical) {
         this.delay = 3000;
@@ -212,7 +214,7 @@ export default class BattleScene extends Phaser.Scene {
       this.playerHealthBar.fillRect(
         this.player.sprite.x - this.player.health / 2,
         this.player.sprite.y - 40,
-        this.player.maxHealth * playerHealthPercent,
+        100 * playerHealthPercent,
         5,
       );
     }
@@ -220,7 +222,7 @@ export default class BattleScene extends Phaser.Scene {
       this.enemyHealthBar.fillRect(
         this.enemy.sprite.x - this.enemy.health / 2,
         this.enemy.sprite.y - 40,
-        this.enemy.maxHealth * enemyHealthPercent,
+        100 * enemyHealthPercent,
         5,
       );
     }
